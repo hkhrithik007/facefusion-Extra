@@ -1,40 +1,36 @@
-from functools import lru_cache
 from typing import Tuple
 
 import numpy
 import scipy
 
 from facefusion import inference_manager
-from facefusion.download import conditional_download_hashes, conditional_download_sources, resolve_download_url
+from facefusion.download import conditional_download_hashes, conditional_download_sources
 from facefusion.filesystem import resolve_relative_path
 from facefusion.thread_helper import thread_semaphore
-from facefusion.typing import Audio, AudioChunk, DownloadScope, InferencePool, ModelOptions, ModelSet
+from facefusion.typing import Audio, AudioChunk, InferencePool, ModelOptions, ModelSet
 
-
-@lru_cache(maxsize = None)
-def create_static_model_set(download_scope : DownloadScope) -> ModelSet:
-	return\
+MODEL_SET : ModelSet =\
+{
+	'kim_vocal_2':
 	{
-		'kim_vocal_2':
+		'hashes':
 		{
-			'hashes':
+			'voice_extractor':
 			{
-				'voice_extractor':
-				{
-					'url': resolve_download_url('models-3.0.0', 'kim_vocal_2.hash'),
-					'path': resolve_relative_path('../.assets/models/kim_vocal_2.hash')
-				}
-			},
-			'sources':
+				'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models-3.0.0/kim_vocal_2.hash',
+				'path': resolve_relative_path('../.assets/models/kim_vocal_2.hash')
+			}
+		},
+		'sources':
+		{
+			'voice_extractor':
 			{
-				'voice_extractor':
-				{
-					'url': resolve_download_url('models-3.0.0', 'kim_vocal_2.onnx'),
-					'path': resolve_relative_path('../.assets/models/kim_vocal_2.onnx')
-				}
+				'url': 'https://github.com/facefusion/facefusion-assets/releases/download/models-3.0.0/kim_vocal_2.onnx',
+				'path': resolve_relative_path('../.assets/models/kim_vocal_2.onnx')
 			}
 		}
 	}
+}
 
 
 def get_inference_pool() -> InferencePool:
@@ -47,14 +43,15 @@ def clear_inference_pool() -> None:
 
 
 def get_model_options() -> ModelOptions:
-	return create_static_model_set('full').get('kim_vocal_2')
+	return MODEL_SET.get('kim_vocal_2')
 
 
 def pre_check() -> bool:
+	download_directory_path = resolve_relative_path('../.assets/models')
 	model_hashes = get_model_options().get('hashes')
 	model_sources = get_model_options().get('sources')
 
-	return conditional_download_hashes(model_hashes) and conditional_download_sources(model_sources)
+	return conditional_download_hashes(download_directory_path, model_hashes) and conditional_download_sources(download_directory_path, model_sources)
 
 
 def batch_extract_voice(audio : Audio, chunk_size : int, step_size : int) -> Audio:

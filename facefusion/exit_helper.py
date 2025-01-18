@@ -1,4 +1,3 @@
-import signal
 import sys
 from time import sleep
 
@@ -8,7 +7,6 @@ from facefusion.typing import ErrorCode
 
 
 def hard_exit(error_code : ErrorCode) -> None:
-	signal.signal(signal.SIGINT, signal.SIG_IGN)
 	sys.exit(error_code)
 
 

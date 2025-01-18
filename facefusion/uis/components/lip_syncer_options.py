@@ -14,12 +14,11 @@ LIP_SYNCER_MODEL_DROPDOWN : Optional[gradio.Dropdown] = None
 def render() -> None:
 	global LIP_SYNCER_MODEL_DROPDOWN
 
-	has_lip_syncer = 'lip_syncer' in state_manager.get_item('processors')
 	LIP_SYNCER_MODEL_DROPDOWN = gradio.Dropdown(
 		label = wording.get('uis.lip_syncer_model_dropdown'),
 		choices = processors_choices.lip_syncer_models,
 		value = state_manager.get_item('lip_syncer_model'),
-		visible = has_lip_syncer
+		visible = 'lip_syncer' in state_manager.get_item('processors')
 	)
 	register_ui_component('lip_syncer_model_dropdown', LIP_SYNCER_MODEL_DROPDOWN)
 

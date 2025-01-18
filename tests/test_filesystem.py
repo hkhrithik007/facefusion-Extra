@@ -105,11 +105,8 @@ def test_create_directory() -> None:
 
 
 def test_list_directory() -> None:
-	files = list_directory(get_test_examples_directory())
-
-	for file in files:
-		assert file.get('path') == get_test_example_file(file.get('name') + file.get('extension'))
-
+	assert list_directory(get_test_examples_directory())
+	assert list_directory(get_test_example_file('source.jpg')) is None
 	assert list_directory('invalid') is None
 
 

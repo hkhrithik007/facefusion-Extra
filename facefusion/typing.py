@@ -67,7 +67,6 @@ Mel = NDArray[Any]
 MelFilterBank = NDArray[Any]
 
 Fps = float
-Duration = float
 Padding = Tuple[int, int, int, int]
 Orientation = Literal['landscape', 'portrait']
 Resolution = Tuple[int, int]
@@ -85,7 +84,7 @@ ProcessStep = Callable[[str, int, Args], bool]
 
 Content = Dict[str, Any]
 
-WarpTemplate = Literal['arcface_112_v1', 'arcface_112_v2', 'arcface_128_v2', 'dfl_whole_face', 'ffhq_512', 'mtcnn_512', 'styleganex_384']
+WarpTemplate = Literal['arcface_112_v1', 'arcface_112_v2', 'arcface_128_v2', 'ffhq_512']
 WarpTemplateSet = Dict[WarpTemplate, NDArray[Any]]
 ProcessMode = Literal['output', 'preview', 'stream']
 
@@ -96,28 +95,34 @@ LogLevelSet = Dict[LogLevel, int]
 TableHeaders = List[str]
 TableContents = List[List[Any]]
 
+VideoMemoryStrategy = Literal['strict', 'moderate', 'tolerant']
 FaceDetectorModel = Literal['many', 'retinaface', 'scrfd', 'yoloface']
 FaceLandmarkerModel = Literal['many', '2dfan4', 'peppa_wutz']
 FaceDetectorSet = Dict[FaceDetectorModel, List[str]]
 FaceSelectorMode = Literal['many', 'one', 'reference']
 FaceSelectorOrder = Literal['left-right', 'right-left', 'top-bottom', 'bottom-top', 'small-large', 'large-small', 'best-worst', 'worst-best']
-FaceOccluderModel = Literal['xseg_1', 'xseg_2']
-FaceParserModel = Literal['bisenet_resnet_18', 'bisenet_resnet_34']
 FaceMaskType = Literal['box', 'occlusion', 'region']
 FaceMaskRegion = Literal['skin', 'left-eyebrow', 'right-eyebrow', 'left-eye', 'right-eye', 'glasses', 'nose', 'mouth', 'upper-lip', 'lower-lip']
-FaceMaskRegionSet = Dict[FaceMaskRegion, int]
-TempFrameFormat = Literal['bmp', 'jpg', 'png']
+TempFrameFormat = Literal['jpg', 'png', 'bmp']
 OutputAudioEncoder = Literal['aac', 'libmp3lame', 'libopus', 'libvorbis']
-OutputVideoEncoder = Literal['libx264', 'libx265', 'libvpx-vp9', 'h264_nvenc', 'hevc_nvenc', 'h264_amf', 'hevc_amf','h264_qsv', 'hevc_qsv', 'h264_videotoolbox', 'hevc_videotoolbox']
+OutputVideoEncoder = Literal['libx264', 'libx265', 'libvpx-vp9', 'h264_nvenc', 'hevc_nvenc', 'h264_amf', 'hevc_amf', 'h264_videotoolbox', 'hevc_videotoolbox']
 OutputVideoPreset = Literal['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower', 'veryslow']
+
+Download = TypedDict('Download',
+{
+	'url' : str,
+	'path' : str
+})
+DownloadSet = Dict[str, Download]
 
 ModelOptions = Dict[str, Any]
 ModelSet = Dict[str, ModelOptions]
 ModelInitializer = NDArray[Any]
 
-ExecutionProvider = Literal['cpu', 'coreml', 'cuda', 'directml', 'openvino', 'rocm', 'tensorrt']
+ExecutionProviderKey = Literal['cpu', 'coreml', 'cuda', 'directml', 'openvino', 'rocm', 'tensorrt']
 ExecutionProviderValue = Literal['CPUExecutionProvider', 'CoreMLExecutionProvider', 'CUDAExecutionProvider', 'DmlExecutionProvider', 'OpenVINOExecutionProvider', 'ROCMExecutionProvider', 'TensorrtExecutionProvider']
-ExecutionProviderSet = Dict[ExecutionProvider, ExecutionProviderValue]
+ExecutionProviderSet = Dict[ExecutionProviderKey, ExecutionProviderValue]
+
 ValueAndUnit = TypedDict('ValueAndUnit',
 {
 	'value' : int,
@@ -135,18 +140,13 @@ ExecutionDeviceProduct = TypedDict('ExecutionDeviceProduct',
 })
 ExecutionDeviceVideoMemory = TypedDict('ExecutionDeviceVideoMemory',
 {
-	'total' : Optional[ValueAndUnit],
-	'free' : Optional[ValueAndUnit]
-})
-ExecutionDeviceTemperature = TypedDict('ExecutionDeviceTemperature',
-{
-	'gpu' : Optional[ValueAndUnit],
-	'memory' : Optional[ValueAndUnit]
+	'total' : ValueAndUnit,
+	'free' : ValueAndUnit
 })
 ExecutionDeviceUtilization = TypedDict('ExecutionDeviceUtilization',
 {
-	'gpu' : Optional[ValueAndUnit],
-	'memory' : Optional[ValueAndUnit]
+	'gpu' : ValueAndUnit,
+	'memory' : ValueAndUnit
 })
 ExecutionDevice = TypedDict('ExecutionDevice',
 {
@@ -154,32 +154,7 @@ ExecutionDevice = TypedDict('ExecutionDevice',
 	'framework' : ExecutionDeviceFramework,
 	'product' : ExecutionDeviceProduct,
 	'video_memory' : ExecutionDeviceVideoMemory,
-	'temperature': ExecutionDeviceTemperature,
 	'utilization' : ExecutionDeviceUtilization
-})
-
-DownloadProvider = Literal['github', 'huggingface']
-DownloadProviderValue = TypedDict('DownloadProviderValue',
-{
-	'url' : str,
-	'path' : str
-})
-DownloadProviderSet = Dict[DownloadProvider, DownloadProviderValue]
-DownloadScope = Literal['lite', 'full']
-Download = TypedDict('Download',
-{
-	'url' : str,
-	'path' : str
-})
-DownloadSet = Dict[str, Download]
-
-VideoMemoryStrategy = Literal['strict', 'moderate', 'tolerant']
-
-File = TypedDict('File',
-{
-	'name' : str,
-	'extension' : str,
-	'path': str
 })
 
 AppContext = Literal['cli', 'ui']
@@ -216,14 +191,10 @@ StateKey = Literal\
 [
 	'command',
 	'config_path',
-	'temp_path',
 	'jobs_path',
 	'source_paths',
 	'target_path',
 	'output_path',
-	'source_pattern',
-	'target_pattern',
-	'output_pattern',
 	'face_detector_model',
 	'face_detector_size',
 	'face_detector_angles',
@@ -239,8 +210,6 @@ StateKey = Literal\
 	'reference_face_position',
 	'reference_face_distance',
 	'reference_frame_number',
-	'face_occluder_model',
-	'face_parser_model',
 	'face_mask_types',
 	'face_mask_blur',
 	'face_mask_padding',
@@ -266,10 +235,9 @@ StateKey = Literal\
 	'execution_providers',
 	'execution_thread_count',
 	'execution_queue_count',
-	'download_providers',
-	'download_scope',
 	'video_memory_strategy',
 	'system_memory_limit',
+	'skip_download',
 	'log_level',
 	'job_id',
 	'job_status',
@@ -279,14 +247,10 @@ State = TypedDict('State',
 {
 	'command' : str,
 	'config_path' : str,
-	'temp_path' : str,
 	'jobs_path' : str,
 	'source_paths' : List[str],
 	'target_path' : str,
 	'output_path' : str,
-	'source_pattern' : str,
-	'target_pattern' : str,
-	'output_pattern' : str,
 	'face_detector_model' : FaceDetectorModel,
 	'face_detector_size' : str,
 	'face_detector_angles' : List[Angle],
@@ -302,8 +266,6 @@ State = TypedDict('State',
 	'reference_face_position' : int,
 	'reference_face_distance' : float,
 	'reference_frame_number' : int,
-	'face_occluder_model' : FaceOccluderModel,
-	'face_parser_model' : FaceParserModel,
 	'face_mask_types' : List[FaceMaskType],
 	'face_mask_blur' : float,
 	'face_mask_padding' : Padding,
@@ -326,13 +288,12 @@ State = TypedDict('State',
 	'ui_layouts' : List[str],
 	'ui_workflow' : UiWorkflow,
 	'execution_device_id' : str,
-	'execution_providers' : List[ExecutionProvider],
+	'execution_providers' : List[ExecutionProviderKey],
 	'execution_thread_count' : int,
 	'execution_queue_count' : int,
-	'download_providers' : List[DownloadProvider],
-	'download_scope' : DownloadScope,
 	'video_memory_strategy' : VideoMemoryStrategy,
 	'system_memory_limit' : int,
+	'skip_download' : bool,
 	'log_level' : LogLevel,
 	'job_id' : str,
 	'job_status' : JobStatus,

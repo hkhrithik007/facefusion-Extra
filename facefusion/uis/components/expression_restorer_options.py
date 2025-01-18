@@ -17,12 +17,11 @@ def render() -> None:
 	global EXPRESSION_RESTORER_MODEL_DROPDOWN
 	global EXPRESSION_RESTORER_FACTOR_SLIDER
 
-	has_expression_restorer = 'expression_restorer' in state_manager.get_item('processors')
 	EXPRESSION_RESTORER_MODEL_DROPDOWN = gradio.Dropdown(
 		label = wording.get('uis.expression_restorer_model_dropdown'),
 		choices = processors_choices.expression_restorer_models,
 		value = state_manager.get_item('expression_restorer_model'),
-		visible = has_expression_restorer
+		visible = 'expression_restorer' in state_manager.get_item('processors')
 	)
 	EXPRESSION_RESTORER_FACTOR_SLIDER = gradio.Slider(
 		label = wording.get('uis.expression_restorer_factor_slider'),
@@ -30,7 +29,7 @@ def render() -> None:
 		step = calc_float_step(processors_choices.expression_restorer_factor_range),
 		minimum = processors_choices.expression_restorer_factor_range[0],
 		maximum = processors_choices.expression_restorer_factor_range[-1],
-		visible = has_expression_restorer
+		visible = 'expression_restorer' in state_manager.get_item('processors'),
 	)
 	register_ui_component('expression_restorer_model_dropdown', EXPRESSION_RESTORER_MODEL_DROPDOWN)
 	register_ui_component('expression_restorer_factor_slider', EXPRESSION_RESTORER_FACTOR_SLIDER)
